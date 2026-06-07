@@ -1,10 +1,5 @@
 # ✈️ Flight Alert System
 
-![AWS](https://img.shields.io/badge/AWS-Serverless-FF9900?logo=amazonaws&logoColor=white)
-![Lambda](https://img.shields.io/badge/AWS_Lambda-Node.js_ESM-F90?logo=awslambda&logoColor=white)
-![DynamoDB](https://img.shields.io/badge/DynamoDB-NoSQL-4053D6?logo=amazondynamodb&logoColor=white)
-![SNS](https://img.shields.io/badge/Amazon_SNS-Notifications-FF4F8B?logo=amazonaws&logoColor=white)
-![EventBridge](https://img.shields.io/badge/EventBridge-Scheduler-E7157B?logo=amazonaws&logoColor=white)
 
 A serverless, event-driven aviation monitoring system that detects configured aircraft types operating near **Cochin International Airport (COK)** using AWS Lambda, EventBridge Scheduler, DynamoDB, and Amazon SNS. The system continuously evaluates live telemetry data, enforces duplicate suppression through persistent state management, and delivers real-time email notifications — entirely without server provisioning or manual intervention.
 
