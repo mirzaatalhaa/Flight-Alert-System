@@ -337,8 +337,4 @@ Position:     10.4821°N, 76.1094°E
 | **Operational observability** | CloudWatch Logs captures structured execution output for every invocation |
 | **NoSQL data modelling** | Partition key design supports O(1) `GetItem` lookups for high-frequency duplicate checks |
 
----
 
-## 📄 License
-
-MIT License. See [`LICENSE`](LICENSE) for details.
