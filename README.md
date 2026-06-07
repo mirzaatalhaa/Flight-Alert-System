@@ -67,17 +67,12 @@ The system follows a strict sequential execution flow on each invocation:
                                                       │
                                                       ▼
                                            📧 Email Subscriber
-```
-
-See [`docs/architecture-diagram.png`](docs/architecture-diagram.png) for the full visual diagram.
-
 ---
 
 ## 📸 Screenshots
 
 | Component | Screenshot |
 |-----------|------------|
-| Architecture Diagram | ![Architecture Diagram](docs/architecture-diagram.png) |
 | EventBridge Scheduler | ![EventBridge Scheduler](docs/eventbridge-scheduler.png) |
 | AlertRules DynamoDB Table | ![AlertRules Table](docs/dynamodb-alert-rules.png) |
 | AlertedAircraft DynamoDB Table | ![AlertedAircraft Table](docs/dynamodb-alert-history.png) |
