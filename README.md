@@ -38,9 +38,9 @@ The system follows a strict sequential execution flow on each invocation:
 │                          │                           │              │   │
 │                          ▼                           ▼              │   │
 │              ┌───────────────────┐   ┌───────────────────────┐      │   │
-│              │ DynamoDB          │   │ Airplanes.live API     │      │   │
-│              │ AlertRules        │   │ (External · No Auth)   │      │   │
-│              │ (Scan rules)      │   │ 250km radius · COK     │      │   │
+│              │ DynamoDB          │   │ Airplanes.live API     │     │   │
+│              │ AlertRules        │   │ (External · No Auth)   │     │   │
+│              │ (Scan rules)      │   │ 250km radius · COK     │     │   │
 │              └───────────────────┘   └───────────────────────┘      │   │
 │                                                      │              │   │
 │                                                      ▼              │   │
@@ -59,8 +59,8 @@ The system follows a strict sequential execution flow on each invocation:
 │                                         └──────────┬──────────┘     │   │
 │                                                    │                │   │
 │  ┌─────────────────────┐    ┌──────────────────┐   │                │   │
-│  │ AWS IAM             │    │ Amazon CloudWatch │◄──┘                │   │
-│  │ Least-privilege     │    │ Logs & Metrics    │                    │   │
+│  │ AWS IAM             │    │ Amazon CloudWatch │◄──┘               │   │
+│  │ Least-privilege     │    │ Logs & Metrics    │                   │   │
 │  │ execution role      │    └──────────────────┘                    │   │
 │  └─────────────────────┘                                            │   │
 └─────────────────────────────────────────────────────────────────────┘   │
