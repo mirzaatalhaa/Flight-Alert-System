@@ -114,7 +114,7 @@ export const handler = async () => {
     await sns.send(
       new PublishCommand({
         TopicArn:
-          "arn:aws:sns:ap-south-1:424322298959:skytracker-flight-alerts",
+          "TopicArn:arn:aws:sns:<REGION>:<ACCOUNT_ID>:skytracker-flight-alerts",
 
         Subject: `SkyTracker Alert - ${airlineName}`,
 
