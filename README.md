@@ -82,7 +82,6 @@ See [`docs/architecture-diagram.png`](docs/architecture-diagram.png) for the ful
 | AlertRules DynamoDB Table | ![AlertRules Table](docs/dynamodb-alert-rules.png) |
 | AlertedAircraft DynamoDB Table | ![AlertedAircraft Table](docs/dynamodb-alert-history.png) |
 | DynamoDB TTL Configuration | ![DynamoDB TTL](docs/dynamodb-ttl.png) |
-| SNS Topic | ![SNS Topic](docs/sns-topic.png) |
 | Sample Email Alert | ![Sample Email Alert](docs/sns-email-alert.png) |
 
 ---
