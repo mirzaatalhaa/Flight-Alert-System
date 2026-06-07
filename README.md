@@ -67,6 +67,7 @@ The system follows a strict sequential execution flow on each invocation:
                                                       │
                                                       ▼
                                            📧 Email Subscriber
+```
 ---
 
 ## 📸 Screenshots
