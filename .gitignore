@@ -4,6 +4,15 @@
 *.tfstate.*
 .terraform.lock.hcl
 
-# Environment files
-.env
-.env.*
+# Terraform generated zip
+terraform/lambda.zip
+
+# Node
+node_modules/
+
+# AWS
+*.pem
+
+# OS
+.DS_Store
+Thumbs.db
