@@ -124,7 +124,17 @@ DynamoDB's native TTL mechanism evaluates stored records against the `expiresAt`
 Flight-Alert-System/
 │
 ├── lambda/
-│   └── index.mjs                    # Core Lambda function (Node.js ESM)
+│   ├── index.mjs                    # Core Lambda function (Node.js ESM)
+│   └── package.json                 # Lambda Node.js project (AWS SDK dependencies)
+│
+├── terraform/
+│   ├── main.tf                      # Provider configuration and S3 remote backend
+│   ├── sns.tf                       # SNS topic resource
+│   ├── dynamodb.tf                  # AlertRules and AlertedAircraft table resources
+│   ├── iam.tf                       # Lambda execution role and inline policies
+│   ├── scheduler.tf                 # EventBridge Scheduler resource
+│   ├── lambda.tf                    # archive_file data source; Lambda resource (pending)
+│   └── variables.tf                 # Input variable declarations
 │
 ├── docs/
 │   ├── architecture-diagram.png     # Full AWS architecture diagram
@@ -153,6 +163,8 @@ Flight-Alert-System/
 | **Amazon SNS** | Managed pub/sub notification delivery; decouples alert generation from subscriber management |
 | **Amazon CloudWatch** | Execution logging, invocation metrics, and error visibility across all Lambda runs |
 | **AWS IAM** | Least-privilege execution role scoped to `dynamodb:GetItem`, `dynamodb:PutItem`, `dynamodb:Scan`, and `sns:Publish` |
+| **Amazon S3** | Remote Terraform state backend (`flight-alert-terraform-state-mtb`); enables safe, team-friendly infrastructure management |
+| **HashiCorp Terraform** | Infrastructure as Code layer managing SNS, DynamoDB, IAM, EventBridge Scheduler, and S3 remote state |
 
 ---
 
@@ -194,6 +206,64 @@ Maintains per-aircraft alert state across Lambda invocations. Enables stateful d
 
 ---
 
+## 🏗️ Infrastructure as Code (Terraform)
+
+The infrastructure layer of this project was migrated from manually managed AWS resources to Infrastructure as Code using Terraform, making the environment reproducible, auditable, and team-ready.
+
+### Migration Approach
+
+Rather than provisioning new resources, all existing production resources were imported into Terraform one by one using `terraform import`, preserving live state throughout the migration. The process covered:
+
+| Resource | Terraform Resource Type | Notes |
+|----------|------------------------|-------|
+| `skytracker-flight-alerts` SNS topic | `aws_sns_topic` | First resource imported |
+| `AlertRules` DynamoDB table | `aws_dynamodb_table` | Schema and billing mode inspected before import |
+| `AlertedAircraft` DynamoDB table | `aws_dynamodb_table` | TTL configuration reconciled post-import |
+| Lambda execution IAM role | `aws_iam_role` | IAM path drift (`/service-role/`) identified and resolved |
+| `skytracker-flight-alert-schedule` EventBridge Scheduler | `aws_scheduler_schedule` | Retry policy drift detected and reconciled |
+| Terraform state bucket | `aws_s3_bucket` (backend) | Local state migrated to S3 remote backend |
+
+The Lambda function itself was intentionally left outside Terraform management — its production deployment package needs to be rebuilt and validated before safely transitioning to `archive_file`-based Terraform control. The Lambda Node.js project (`package.json`, AWS SDK dependencies) was structured in preparation for this final step. Overall infrastructure migration is approximately **90% complete**.
+
+### Remote State
+
+Terraform state is stored remotely in S3 (`flight-alert-terraform-state-mtb`), enabling safe concurrent access and eliminating the risks of local state management in collaborative environments.
+
+### Terraform Workflows Used
+
+```bash
+terraform init        # Initialise provider and backend configuration
+terraform validate    # Validate configuration syntax
+terraform plan        # Preview changes before applying
+terraform import      # Bring existing AWS resources under Terraform management
+terraform state list  # Inspect resources tracked in state
+terraform state show  # View detailed state for a specific resource
+```
+
+### Key Concepts Applied
+
+- **State management** — understanding the relationship between `.tf` configuration, `terraform.tfstate`, and actual AWS infrastructure
+- **Drift detection and reconciliation** — identifying and resolving discrepancies between Terraform configuration and real resource state (IAM path, scheduler retry policy)
+- **Data sources vs resources** — using `archive_file` data source to generate reproducible Lambda deployment artifacts without managing the file as a Terraform resource
+- **Remote backend** — migrating from local to S3-backed state for durability and team safety
+- **Infrastructure dependencies** — sequencing resource imports to respect dependency order
+
+### Infrastructure Coverage
+
+```
+✅ SNS Topic                  — skytracker-flight-alerts
+✅ DynamoDB (AlertRules)       — configuration table
+✅ DynamoDB (AlertedAircraft)  — state table with TTL
+✅ IAM Role                   — Lambda execution role with inline policies
+✅ EventBridge Scheduler      — skytracker-flight-alert-schedule
+✅ S3 Backend                 — flight-alert-terraform-state-mtb
+⏳ Lambda Function            — pending deployment package rebuild
+```
+
+All managed resources have reached a clean state — `terraform plan` returns **"No changes. Your infrastructure matches the configuration."**
+
+---
+
 ## 📊 Results
 
 The deployed system achieves the following operational outcomes:
@@ -227,9 +297,10 @@ At the expected invocation rate (288 executions per day), operational costs for 
 
 ### Prerequisites
 
-- AWS account with permissions to create Lambda, DynamoDB, SNS, EventBridge Scheduler, and IAM resources
+- AWS account with permissions to create Lambda, DynamoDB, SNS, EventBridge Scheduler, IAM, and S3 resources
 - Node.js 18+ (for local development and packaging)
 - AWS CLI configured with appropriate credentials
+- Terraform 1.0+ (optional — for IaC-managed deployments; see [Infrastructure as Code](#️-infrastructure-as-code-terraform) section above)
 
 ### Steps
 
@@ -331,6 +402,9 @@ Position:     10.4821°N, 76.1094°E
 | **External API integration** | Airplanes.live radial endpoint provides unauthenticated real-time telemetry |
 | **IAM least-privilege access** | Execution role scoped to the minimum required actions and specific resource ARNs |
 | **Operational observability** | CloudWatch Logs captures structured execution output for every invocation |
-| **NoSQL data modelling** | Partition key design supports O(1) `GetItem` lookups for high-frequency duplicate checks |
+| **Infrastructure as Code** | Terraform manages SNS, DynamoDB, IAM, and EventBridge resources; state stored remotely in S3 |
+| **IaC state management** | Terraform state tracks real AWS resources; remote S3 backend enables safe team-based workflows |
+| **Drift detection** | `terraform plan` identifies divergence between configuration and live infrastructure; reconciled for IAM path and scheduler retry policy |
+| **Resource import workflow** | Existing production resources imported into Terraform without recreation, preserving live state |
 
 
