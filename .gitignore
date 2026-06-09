@@ -1,0 +1,9 @@
+# Terraform
+.terraform/
+*.tfstate
+*.tfstate.*
+.terraform.lock.hcl
+
+# Environment files
+.env
+.env.*
